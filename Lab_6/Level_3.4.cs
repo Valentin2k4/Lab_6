@@ -1,146 +1,111 @@
-namespace Lab6;
-// 3.4
-//Результаты сессии содержат оценки 5 экзаменов по каждой группе.
-//Определить средний балл для трех групп студентов одного потока и выдать список групп в порядке убывания среднего балла.
+/* namespace Lab6;
 
-class Program
+// Лыжные гонки проводятся отдельно для двух групп участников.
+// Результаты соревнований заданы в виде фамилий участников и их результатов в каждой группе.
+// Расположить результаты соревнований в каждой группе в порядке занятых мест.
+// Объединить результаты обеих групп с сохранением упорядоченности и вывести в виде таблицы с заголовком.
+
+public class Lebel_3_4
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
-        static Student[] deleteStudentWithBadMarks(Student[] array)
-        {
-            int length = array.Length;
-            int index = 0;
+        List<Sportsmen> sportsmens_1 = new List<Sportsmen>();
+        sportsmens_1.Add(new Sportsmen("Ann", 140));
+        sportsmens_1.Add(new Sportsmen("Ben", 1000));
+        sportsmens_1.Add(new Sportsmen("Tom", 320));
 
-            while (index < length)
-            {
-                if (array[index].minMark == 2)
-                {
-                    for (int i = index + 1; i < length; i++)
-                    {
-                        array[i - 1] = array[i];
-                    }
-                    length--;
-                }
-                else
-                {
-                    index++;
-                }
-                Array.Resize(ref array, length);
-            }
-            return array;
-        }
+        sortSportsmens(sportsmens_1);
 
-        static Group[] sortedGroups(Group[] groups)
-        {
-            for (int i = 0; i < groups.Length; i++)
-            {
-                for (int j = i + 1; j < groups.Length; j++)
-                {
-                    if (groups[i].averageMark < groups[j].averageMark)
-                    {
-                        (groups[i], groups[j]) = (groups[j], groups[i]);
-                    }
-                }
-            }
-            return groups;
-        }
+        List<Sportsmen> sportsmens_2 = new List<Sportsmen>();
+        sportsmens_2.Add(new Sportsmen("Sara", 400));
+        sportsmens_2.Add(new Sportsmen("Ivan", 200));
+        sportsmens_2.Add(new Sportsmen("Josh", 130));
 
-        Student[] students_19 = new Student[4];
-        students_19[0] = new Student(1, new int[] { 2, 5, 5, 5, 5 });
-        students_19[1] = new Student(2, new int[] { 2, 3, 4, 5, 4 });
-        students_19[2] = new Student(3, new int[] { 3, 3, 3, 5, 3 });
-        students_19[3] = new Student(4, new int[] { 2, 2, 3, 2, 3 });
+        sortSportsmens(sportsmens_2);
 
+        Sportsmen.Print(sportsmens_1);
+        Sportsmen.Print(sportsmens_2);
 
-        students_19 = deleteStudentWithBadMarks(students_19);
-
-        Student[] students_20 = new Student[4];
-        students_20[0] = new Student(1, new int[] { 3, 3, 4, 5, 5 });
-        students_20[1] = new Student(2, new int[] { 2, 2, 4, 5, 4 });
-        students_20[2] = new Student(3, new int[] { 5, 3, 4, 5, 5 });
-        students_20[3] = new Student(4, new int[] { 5, 5, 5, 5, 3 });
-
-
-        students_20 = deleteStudentWithBadMarks(students_20);
-
-        Student[] students_21 = new Student[4];
-        students_21[0] = new Student(1, new int[] { 5, 5, 5, 4, 4 });
-        students_21[1] = new Student(2, new int[] { 3, 3, 4, 5, 4 });
-        students_21[2] = new Student(3, new int[] { 5, 3, 4, 5, 3 });
-        students_21[3] = new Student(4, new int[] { 2, 2, 4, 5, 3 });
-
-        students_21 = deleteStudentWithBadMarks(students_21);
-
-
-        Group[] groups = new Group[3];
-        groups[0] = new Group("19", students_19);
-        groups[1] = new Group("20", students_20);
-        groups[2] = new Group("21", students_21);
-
-        sortedGroups(groups);
-
-
-        foreach (var group in groups) group.Print();
+        var TotalResult = new List<Sportsmen>(CombiningTheResult(sportsmens_1, sportsmens_2));
+        PrintParticipantTable(TotalResult);
         Console.ReadKey();
     }
 
-    struct Student
+    public struct Sportsmen
     {
-        public int StudentId;
-        public int[] marks;
-        public int minMark = 5;
-        public double averageMark { get; set; }
-        public Student(int StudentId, int[] marks)
+        public string surName { get; set; }
+        public int result { get; set; }
+        public Sportsmen(string surName, int result)
         {
-            this.StudentId = StudentId;
-            this.marks = marks;
-            for (int i = 0; i < marks.Length; i++)
+            this.surName = surName;
+            this.result = result;
+        }
+        public static void Print(List<Sportsmen> sportsmens)
+        {
+            foreach (var sportsmen in sportsmens)
             {
-                if (marks[i] < minMark) { minMark = marks[i]; }
-                averageMark += marks[i];
-            } averageMark /= marks.Length;
+                Console.WriteLine($"{sportsmen.surName}\tResult: {sportsmen.result}");
+            }
+            Console.WriteLine();
         }
     }
 
-    struct Group
+    public static List<Sportsmen> CombiningTheResult(List<Sportsmen> group_1, List<Sportsmen> group_2)
     {
-        public string groupName;
-        public Student[] students;
-        public double averageMark;
-        public Group(string groupName, Student[] students)
+        List<Sportsmen> allsportsmens = new List<Sportsmen>();
+        while (group_1.Count > 0 || group_2.Count > 0)
         {
-            this.groupName = groupName;
-            this.students = students;
-            foreach (var student in students) averageMark += student.averageMark;
-            averageMark /= students.Length;
-
-            for (int i = 0; i < students.Length; i++) {
-                for (int j = i + 1; j < students.Length; j++) {
-                    if (students[i].averageMark < students[j].averageMark) { (students[i], students[j]) = (students[j], students[i]); }
-                }
-            }
-        }
-
-        public void Print()
-        {
-            if (averageMark > 0)
+            if (group_1.Count == 0)
             {
-                Console.WriteLine($"BIVT_22_{groupName} {averageMark:F1}");
-                foreach (Student student in students)
-                {
-                    Console.Write($"Студент {student.StudentId}  Ср.оценка – {student.averageMark:F1};");
-                    Console.WriteLine();
-                }
-                Console.WriteLine();
+                allsportsmens.Add(group_2[0]);
+                group_2.RemoveAt(0);
+            }
+            else if (group_2.Count == 0)
+            {
+                allsportsmens.Add(group_1[0]);
+                group_1.RemoveAt(0);
+            }
+            else if (group_1[0].result > group_2[0].result)
+            {
+                allsportsmens.Add(group_1[0]);
+                group_1.RemoveAt(0);
             }
             else
             {
-                Console.WriteLine($"BIVT_22_{groupName}");
-                Console.WriteLine("В этой группе все двоечники!");
-                Console.WriteLine();
+                allsportsmens.Add(group_2[0]);
+                group_2.RemoveAt(0);
             }
         }
+        return allsportsmens;
     }
 
+    public static List<Sportsmen> sortSportsmens(List<Sportsmen> sportsmens)
+    {
+        for (int i = 0; i < sportsmens.Count; i++)
+        {
+            for (int j = i + 1; j < sportsmens.Count; j++)
+            {
+                if (sportsmens[i].result < sportsmens[j].result)
+                {
+                    (sportsmens[i], sportsmens[j]) = (sportsmens[j], sportsmens[i]);
+                }
+            }
+        }
+        return sportsmens;
+    }
+
+    public static void PrintParticipantTable(List<Sportsmen> group)
+    {
+        foreach (var participant in group)
+        {
+            Console.WriteLine($"{participant.surName}\tResult: {participant.result}");
+        }
+
+    }
 }
+*/
+
+
+
+
+
